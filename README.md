@@ -1,5 +1,5 @@
 # fec-individual-contribution-engine
-Scrape the FEC API of the United States government to perform individual contribution analysis and financial analysis on a grassroots level based on a corpus of last names, searching by state, zipcode, etc. 
+Query the FEC API of the United States government to perform individual contribution analysis and financial analysis on a grassroots level based on a corpus of last names, searching by state, zipcode, etc. 
 
 Currently there is a script (`count_indian_surname_candidate_support.py`) that will take in a corpus of last names, which has been defaulted with surnames of South Asian (mostly Indian, Hindu) origin. The script will execute a search of each last name, for each state in the U.S. and read the memo of each result and tokenize the memo string. 
 
