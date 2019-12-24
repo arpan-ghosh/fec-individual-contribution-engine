@@ -90,4 +90,4 @@ The `recipient` data structure looks like the following:
                 'WI': {'PATEL': 2}}}
 ```
 
-You are 100% free to use this code for any purpose you desire, be it personal, commercial, educational, etc. That being said, the use of this code by yourself and/or the owner of the machine executing my code, further relinquishes me of any possible liability incurred as a result. If you would like to donate PayPal @ arpanghosh95@gmail.com
+You are 100% free to use this code for any purpose you desire, be it personal, commercial, educational, etc. That being said, the use of this code by yourself and/or the owner of the machine executing my code, further relinquishes me of any possible liability incurred as a result. But, donations are welcome via PayPal @ arpanghosh95@gmail.com. Enjoy!
