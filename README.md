@@ -1,5 +1,9 @@
 # fec-individual-contribution-engine
 
+### The final product of this project are Python classes that output large files. The main program queries the FEC API of the United States government to perform individual contribution analysis and financial analysis based on a corpus of last names, searching by state and zipcode, and tracking their candidate support over time. The data returned is categorized with raw counts based on the candidate receiving donation, categorized by state and last name.
+
+### In Progress: The next iteration is a highly optimized implementation in Go, leveraging concurrent channels to crunch extremely large corpus searches, some data cleansing to enhance reliability, and the final dataset being outputted into pickle files.
+
 Query the FEC API of the United States government to perform individual contribution analysis and financial analysis on a grassroots level based on a corpus of last names, searching by state, zipcode, etc. 
 
 Currently there is a script (`count_indian_surname_candidate_support.py`) that will take in a corpus of last names, which has been defaulted with surnames of South Asian (mostly Indian, Hindu) origin. The script will execute a search of each last name, for each state in the U.S. and read the memo of each result and tokenize the memo string. 
