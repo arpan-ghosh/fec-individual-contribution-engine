@@ -2,7 +2,7 @@
 
 #### The final product of this project are Python classes that output large files. The main program queries the FEC API of the United States government to perform individual contribution analysis and financial analysis based on a corpus of last names, searching by state and zipcode, and tracking their candidate support over time. The data returned is categorized with raw counts based on the candidate receiving donation, categorized by state and last name.
 
-#### In Progress: The next iteration is a highly optimized implementation in Go, leveraging concurrent channels to crunch extremely large corpus searches, some data cleansing to enhance reliability, and the final dataset being outputted into JSON files.
+#### In Progress: In Progress: The next iteration is a highly optimized implementation in Go, leveraging concurrent channels to crunch extremely large corpus searches, some data cleansing to enhance reliability, communicating via a REST layer using GraphQL, and the final dataset being outputted into JSON files.
 
 Query the FEC API of the United States government to perform individual contribution analysis and financial analysis on a grassroots level based on a corpus of last names, searching by state, zipcode, etc. 
 
