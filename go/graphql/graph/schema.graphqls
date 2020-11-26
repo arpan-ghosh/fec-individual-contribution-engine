@@ -1,0 +1,40 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type IdentificationNumber {
+    _id: String!
+}
+
+type MinimumMetadata {
+  lastName: String!
+  affiliation: String!
+}
+
+type IndividualContributor {
+  _id: String!
+  firstName: String!
+  lastName: String!
+  state: Boolean!
+  zipCode: Int
+}
+
+union Candidate = MinimumMetadata | IdentificationNumber
+union PAC = MinimumMetadata | IdentificationNumber
+union Committee = MinimumMetadata | IdentificationNumber
+
+type Query {
+  individualContributor(_id: String!) : IndividualContributor!
+  individualContributors: [IndividualContributor!]!
+}
+
+input NewIndividualContributor {
+  firstName: String!
+  lastName: String!
+  state: Boolean!
+  zipCode: Int
+}
+
+type Mutation {
+  createIndividualContributor(input: NewIndividualContributor): IndividualContributor!
+}
