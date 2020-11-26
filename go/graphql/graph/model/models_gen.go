@@ -2,6 +2,10 @@
 
 package model
 
+import (
+	"time"
+)
+
 type Candidate interface {
 	IsCandidate()
 }
@@ -30,6 +34,15 @@ type IndividualContributor struct {
 	ZipCode   *int   `json:"zipCode"`
 }
 
+type IndividualRecipient struct {
+	ID               string     `json:"_id"`
+	Date             *time.Time `json:"date"`
+	FirstName        *string    `json:"firstName"`
+	LastName         *string    `json:"lastName"`
+	PartyAffiliation *string    `json:"partyAffiliation"`
+	Memo             *string    `json:"memo"`
+}
+
 type MinimumMetadata struct {
 	LastName    string `json:"lastName"`
 	Affiliation string `json:"affiliation"`
@@ -44,4 +57,16 @@ type NewIndividualContributor struct {
 	LastName  string `json:"lastName"`
 	State     string `json:"state"`
 	ZipCode   *int   `json:"zipCode"`
+}
+
+type NewIndividualRecipient struct {
+	FirstName        *string `json:"firstName"`
+	LastName         *string `json:"lastName"`
+	PartyAffiliation *string `json:"partyAffiliation"`
+	Memo             *string `json:"memo"`
+}
+
+type RecipientQuery struct {
+	Recipient            *IndividualRecipient   `json:"recipient"`
+	IndividualRecipients []*IndividualRecipient `json:"IndividualRecipients"`
 }

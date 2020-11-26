@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -56,6 +57,15 @@ type ComplexityRoot struct {
 		ZipCode   func(childComplexity int) int
 	}
 
+	IndividualRecipient struct {
+		Date             func(childComplexity int) int
+		FirstName        func(childComplexity int) int
+		ID               func(childComplexity int) int
+		LastName         func(childComplexity int) int
+		Memo             func(childComplexity int) int
+		PartyAffiliation func(childComplexity int) int
+	}
+
 	MinimumMetadata struct {
 		Affiliation func(childComplexity int) int
 		LastName    func(childComplexity int) int
@@ -63,20 +73,31 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateIndividualContributor func(childComplexity int, input *model.NewIndividualContributor) int
+		CreateIndividualRecipient   func(childComplexity int, input *model.NewIndividualRecipient) int
 	}
 
 	Query struct {
 		IndividualContributor  func(childComplexity int, id string) int
 		IndividualContributors func(childComplexity int) int
+		IndividualRecipient    func(childComplexity int, firstName *string) int
+		IndividualRecipients   func(childComplexity int) int
+	}
+
+	RecipientQuery struct {
+		IndividualRecipients func(childComplexity int) int
+		Recipient            func(childComplexity int, firstName *string) int
 	}
 }
 
 type MutationResolver interface {
 	CreateIndividualContributor(ctx context.Context, input *model.NewIndividualContributor) (*model.IndividualContributor, error)
+	CreateIndividualRecipient(ctx context.Context, input *model.NewIndividualRecipient) (*model.IndividualRecipient, error)
 }
 type QueryResolver interface {
 	IndividualContributor(ctx context.Context, id string) (*model.IndividualContributor, error)
 	IndividualContributors(ctx context.Context) ([]*model.IndividualContributor, error)
+	IndividualRecipient(ctx context.Context, firstName *string) (*model.IndividualRecipient, error)
+	IndividualRecipients(ctx context.Context) ([]*model.IndividualRecipient, error)
 }
 
 type executableSchema struct {
@@ -136,6 +157,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.IndividualContributor.ZipCode(childComplexity), true
 
+	case "IndividualRecipient.date":
+		if e.complexity.IndividualRecipient.Date == nil {
+			break
+		}
+
+		return e.complexity.IndividualRecipient.Date(childComplexity), true
+
+	case "IndividualRecipient.firstName":
+		if e.complexity.IndividualRecipient.FirstName == nil {
+			break
+		}
+
+		return e.complexity.IndividualRecipient.FirstName(childComplexity), true
+
+	case "IndividualRecipient._id":
+		if e.complexity.IndividualRecipient.ID == nil {
+			break
+		}
+
+		return e.complexity.IndividualRecipient.ID(childComplexity), true
+
+	case "IndividualRecipient.lastName":
+		if e.complexity.IndividualRecipient.LastName == nil {
+			break
+		}
+
+		return e.complexity.IndividualRecipient.LastName(childComplexity), true
+
+	case "IndividualRecipient.memo":
+		if e.complexity.IndividualRecipient.Memo == nil {
+			break
+		}
+
+		return e.complexity.IndividualRecipient.Memo(childComplexity), true
+
+	case "IndividualRecipient.partyAffiliation":
+		if e.complexity.IndividualRecipient.PartyAffiliation == nil {
+			break
+		}
+
+		return e.complexity.IndividualRecipient.PartyAffiliation(childComplexity), true
+
 	case "MinimumMetadata.affiliation":
 		if e.complexity.MinimumMetadata.Affiliation == nil {
 			break
@@ -162,6 +225,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateIndividualContributor(childComplexity, args["input"].(*model.NewIndividualContributor)), true
 
+	case "Mutation.createIndividualRecipient":
+		if e.complexity.Mutation.CreateIndividualRecipient == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createIndividualRecipient_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateIndividualRecipient(childComplexity, args["input"].(*model.NewIndividualRecipient)), true
+
 	case "Query.individualContributor":
 		if e.complexity.Query.IndividualContributor == nil {
 			break
@@ -180,6 +255,44 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.IndividualContributors(childComplexity), true
+
+	case "Query.individualRecipient":
+		if e.complexity.Query.IndividualRecipient == nil {
+			break
+		}
+
+		args, err := ec.field_Query_individualRecipient_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.IndividualRecipient(childComplexity, args["firstName"].(*string)), true
+
+	case "Query.individualRecipients":
+		if e.complexity.Query.IndividualRecipients == nil {
+			break
+		}
+
+		return e.complexity.Query.IndividualRecipients(childComplexity), true
+
+	case "RecipientQuery.IndividualRecipients":
+		if e.complexity.RecipientQuery.IndividualRecipients == nil {
+			break
+		}
+
+		return e.complexity.RecipientQuery.IndividualRecipients(childComplexity), true
+
+	case "RecipientQuery.recipient":
+		if e.complexity.RecipientQuery.Recipient == nil {
+			break
+		}
+
+		args, err := ec.field_RecipientQuery_recipient_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.RecipientQuery.Recipient(childComplexity, args["firstName"].(*string)), true
 
 	}
 	return 0, false
@@ -249,6 +362,8 @@ var sources = []*ast.Source{
 #
 # https://gqlgen.com/getting-started/
 
+scalar Time
+
 type IdentificationNumber {
     _id: String!
 }
@@ -266,6 +381,15 @@ type IndividualContributor {
   zipCode: Int
 }
 
+type IndividualRecipient {
+  _id: String!
+  date: Time
+  firstName: String
+  lastName: String
+  partyAffiliation: String
+  memo: String
+}
+
 union Candidate = MinimumMetadata | IdentificationNumber
 union PAC = MinimumMetadata | IdentificationNumber
 union Committee = MinimumMetadata | IdentificationNumber
@@ -273,6 +397,13 @@ union Committee = MinimumMetadata | IdentificationNumber
 type Query {
   individualContributor(_id: String!) : IndividualContributor!
   individualContributors: [IndividualContributor!]!
+  individualRecipient(firstName:String) : IndividualRecipient!
+  individualRecipients: [IndividualRecipient!]!
+}
+
+type RecipientQuery {
+  recipient(firstName: String) : IndividualRecipient!
+  IndividualRecipients: [IndividualRecipient!]!
 }
 
 input NewIndividualContributor {
@@ -282,8 +413,16 @@ input NewIndividualContributor {
   zipCode: Int
 }
 
+input NewIndividualRecipient {
+  firstName: String
+  lastName: String
+  partyAffiliation: String
+  memo: String
+}
+
 type Mutation {
   createIndividualContributor(input: NewIndividualContributor): IndividualContributor!
+  createIndividualRecipient(input: NewIndividualRecipient): IndividualRecipient!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -299,6 +438,21 @@ func (ec *executionContext) field_Mutation_createIndividualContributor_args(ctx 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalONewIndividualContributor2ᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐNewIndividualContributor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createIndividualRecipient_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NewIndividualRecipient
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalONewIndividualRecipient2ᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐNewIndividualRecipient(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -334,6 +488,36 @@ func (ec *executionContext) field_Query_individualContributor_args(ctx context.C
 		}
 	}
 	args["_id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_individualRecipient_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["firstName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firstName"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["firstName"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_RecipientQuery_recipient_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["firstName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firstName"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["firstName"] = arg0
 	return args, nil
 }
 
@@ -582,6 +766,201 @@ func (ec *executionContext) _IndividualContributor_zipCode(ctx context.Context, 
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _IndividualRecipient__id(ctx context.Context, field graphql.CollectedField, obj *model.IndividualRecipient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "IndividualRecipient",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _IndividualRecipient_date(ctx context.Context, field graphql.CollectedField, obj *model.IndividualRecipient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "IndividualRecipient",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Date, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _IndividualRecipient_firstName(ctx context.Context, field graphql.CollectedField, obj *model.IndividualRecipient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "IndividualRecipient",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FirstName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _IndividualRecipient_lastName(ctx context.Context, field graphql.CollectedField, obj *model.IndividualRecipient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "IndividualRecipient",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _IndividualRecipient_partyAffiliation(ctx context.Context, field graphql.CollectedField, obj *model.IndividualRecipient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "IndividualRecipient",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PartyAffiliation, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _IndividualRecipient_memo(ctx context.Context, field graphql.CollectedField, obj *model.IndividualRecipient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "IndividualRecipient",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Memo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _MinimumMetadata_lastName(ctx context.Context, field graphql.CollectedField, obj *model.MinimumMetadata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -694,6 +1073,48 @@ func (ec *executionContext) _Mutation_createIndividualContributor(ctx context.Co
 	return ec.marshalNIndividualContributor2ᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐIndividualContributor(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_createIndividualRecipient(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createIndividualRecipient_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateIndividualRecipient(rctx, args["input"].(*model.NewIndividualRecipient))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.IndividualRecipient)
+	fc.Result = res
+	return ec.marshalNIndividualRecipient2ᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐIndividualRecipient(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_individualContributor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -771,6 +1192,83 @@ func (ec *executionContext) _Query_individualContributors(ctx context.Context, f
 	return ec.marshalNIndividualContributor2ᚕᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐIndividualContributorᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_individualRecipient(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_individualRecipient_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().IndividualRecipient(rctx, args["firstName"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.IndividualRecipient)
+	fc.Result = res
+	return ec.marshalNIndividualRecipient2ᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐIndividualRecipient(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_individualRecipients(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().IndividualRecipients(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.IndividualRecipient)
+	fc.Result = res
+	return ec.marshalNIndividualRecipient2ᚕᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐIndividualRecipientᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -840,6 +1338,83 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RecipientQuery_recipient(ctx context.Context, field graphql.CollectedField, obj *model.RecipientQuery) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RecipientQuery",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_RecipientQuery_recipient_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Recipient, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.IndividualRecipient)
+	fc.Result = res
+	return ec.marshalNIndividualRecipient2ᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐIndividualRecipient(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RecipientQuery_IndividualRecipients(ctx context.Context, field graphql.CollectedField, obj *model.RecipientQuery) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RecipientQuery",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IndividualRecipients, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.IndividualRecipient)
+	fc.Result = res
+	return ec.marshalNIndividualRecipient2ᚕᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐIndividualRecipientᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -1973,6 +2548,50 @@ func (ec *executionContext) unmarshalInputNewIndividualContributor(ctx context.C
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewIndividualRecipient(ctx context.Context, obj interface{}) (model.NewIndividualRecipient, error) {
+	var it model.NewIndividualRecipient
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "firstName":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firstName"))
+			it.FirstName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lastName":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastName"))
+			it.LastName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "partyAffiliation":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("partyAffiliation"))
+			it.PartyAffiliation, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "memo":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("memo"))
+			it.Memo, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2121,6 +2740,43 @@ func (ec *executionContext) _IndividualContributor(ctx context.Context, sel ast.
 	return out
 }
 
+var individualRecipientImplementors = []string{"IndividualRecipient"}
+
+func (ec *executionContext) _IndividualRecipient(ctx context.Context, sel ast.SelectionSet, obj *model.IndividualRecipient) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, individualRecipientImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("IndividualRecipient")
+		case "_id":
+			out.Values[i] = ec._IndividualRecipient__id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "date":
+			out.Values[i] = ec._IndividualRecipient_date(ctx, field, obj)
+		case "firstName":
+			out.Values[i] = ec._IndividualRecipient_firstName(ctx, field, obj)
+		case "lastName":
+			out.Values[i] = ec._IndividualRecipient_lastName(ctx, field, obj)
+		case "partyAffiliation":
+			out.Values[i] = ec._IndividualRecipient_partyAffiliation(ctx, field, obj)
+		case "memo":
+			out.Values[i] = ec._IndividualRecipient_memo(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var minimumMetadataImplementors = []string{"MinimumMetadata", "Candidate", "PAC", "Committee"}
 
 func (ec *executionContext) _MinimumMetadata(ctx context.Context, sel ast.SelectionSet, obj *model.MinimumMetadata) graphql.Marshaler {
@@ -2170,6 +2826,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "createIndividualContributor":
 			out.Values[i] = ec._Mutation_createIndividualContributor(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createIndividualRecipient":
+			out.Values[i] = ec._Mutation_createIndividualRecipient(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2227,10 +2888,70 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "individualRecipient":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_individualRecipient(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "individualRecipients":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_individualRecipients(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
 			out.Values[i] = ec._Query___schema(ctx, field)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var recipientQueryImplementors = []string{"RecipientQuery"}
+
+func (ec *executionContext) _RecipientQuery(ctx context.Context, sel ast.SelectionSet, obj *model.RecipientQuery) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, recipientQueryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RecipientQuery")
+		case "recipient":
+			out.Values[i] = ec._RecipientQuery_recipient(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "IndividualRecipients":
+			out.Values[i] = ec._RecipientQuery_IndividualRecipients(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2553,6 +3274,57 @@ func (ec *executionContext) marshalNIndividualContributor2ᚖgithubᚗcomᚋarpa
 	return ec._IndividualContributor(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNIndividualRecipient2githubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐIndividualRecipient(ctx context.Context, sel ast.SelectionSet, v model.IndividualRecipient) graphql.Marshaler {
+	return ec._IndividualRecipient(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNIndividualRecipient2ᚕᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐIndividualRecipientᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.IndividualRecipient) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNIndividualRecipient2ᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐIndividualRecipient(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNIndividualRecipient2ᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐIndividualRecipient(ctx context.Context, sel ast.SelectionSet, v *model.IndividualRecipient) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._IndividualRecipient(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2844,6 +3616,14 @@ func (ec *executionContext) unmarshalONewIndividualContributor2ᚖgithubᚗcom�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalONewIndividualRecipient2ᚖgithubᚗcomᚋarpanᚑghoshᚋgraphqlᚋgraphᚋmodelᚐNewIndividualRecipient(ctx context.Context, v interface{}) (*model.NewIndividualRecipient, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNewIndividualRecipient(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2866,6 +3646,21 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalTime(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalTime(*v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

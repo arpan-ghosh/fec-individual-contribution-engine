@@ -12,15 +12,27 @@ import (
 )
 
 func (r *mutationResolver) CreateIndividualContributor(ctx context.Context, input *model.NewIndividualContributor) (*model.IndividualContributor, error) {
-	return db.Save(input), nil
+	return db.SaveIndividualContributor(input), nil
+}
+
+func (r *mutationResolver) CreateIndividualRecipient(ctx context.Context, input *model.NewIndividualRecipient) (*model.IndividualRecipient, error) {
+	return db.SaveIndividualRecipient(input), nil
 }
 
 func (r *queryResolver) IndividualContributor(ctx context.Context, id string) (*model.IndividualContributor, error) {
-	return db.FindByID(id), nil
+	return db.FindContributorByID(id), nil
 }
 
 func (r *queryResolver) IndividualContributors(ctx context.Context) ([]*model.IndividualContributor, error) {
-	return db.All(), nil
+	return db.ContributorAll(), nil
+}
+
+func (r *queryResolver) IndividualRecipient(ctx context.Context, firstName string) (*model.IndividualRecipient, error) {
+	return db.FindRecipientByFirstName(firstName), nil
+}
+
+func (r *queryResolver) IndividualRecipients(ctx context.Context) ([]*model.IndividualRecipient, error) {
+	return db.RecipientAll(), nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

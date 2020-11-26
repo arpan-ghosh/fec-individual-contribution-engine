@@ -2,6 +2,8 @@
 #
 # https://gqlgen.com/getting-started/
 
+scalar Time
+
 type IdentificationNumber {
     _id: String!
 }
@@ -19,6 +21,15 @@ type IndividualContributor {
   zipCode: Int
 }
 
+type IndividualRecipient {
+  _id: String!
+  date: Time
+  firstName: String
+  lastName: String
+  partyAffiliation: String
+  memo: String
+}
+
 union Candidate = MinimumMetadata | IdentificationNumber
 union PAC = MinimumMetadata | IdentificationNumber
 union Committee = MinimumMetadata | IdentificationNumber
@@ -26,6 +37,13 @@ union Committee = MinimumMetadata | IdentificationNumber
 type Query {
   individualContributor(_id: String!) : IndividualContributor!
   individualContributors: [IndividualContributor!]!
+  individualRecipient(firstName:String) : IndividualRecipient!
+  individualRecipients: [IndividualRecipient!]!
+}
+
+type RecipientQuery {
+  recipient(firstName: String) : IndividualRecipient!
+  IndividualRecipients: [IndividualRecipient!]!
 }
 
 input NewIndividualContributor {
@@ -35,6 +53,14 @@ input NewIndividualContributor {
   zipCode: Int
 }
 
+input NewIndividualRecipient {
+  firstName: String
+  lastName: String
+  partyAffiliation: String
+  memo: String
+}
+
 type Mutation {
   createIndividualContributor(input: NewIndividualContributor): IndividualContributor!
+  createIndividualRecipient(input: NewIndividualRecipient): IndividualRecipient!
 }
