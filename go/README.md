@@ -17,12 +17,16 @@
 
 
 <!-- ABOUT THE PROJECT -->
-## About The Project
+## About The Project 
 
-The main goal of this project is to map political affiliation of the Indian American demographic. We can do this by isolating for South Asian names, provided in a CSV corpus.
-This is just one application, you can isolate other demographics and make inferences by analyzing the data returned. 
+This is a work in progress.
 
-In this example we are just counting South Asian surnames, associating them to a candidate by using regular expressions to find candidate, PAC, or commitee support, and categorizing by state. You can start to see why this can be a very powerful tool, and why certain entities may want to do this type of analysis. 
+The main goal of this project is to showcase Golang, Python, and REST + GraphQL expertise. I'm also interested to find out how well the Go implementation  does at crunching incredibly large queries using concurrent channels.
+
+Specifically though, this project maps political affiliation of the Indian American demographic. We can do this by isolating for South Asian names, provided in a CSV corpus.
+This is just one application, you can isolate other demographics, and filter based on a multitude of factors including zip code, commitetes, dates, campaign finance data efilings, etc. and make inferences by analyzing the data returned. Feel free to browse their API here https://api.open.fec.gov/developers/.
+
+In this example we are just counting South Asian surnames, associating them to a candidate by using regular expressions to find candidate, PAC, or commitee support, and categorizing by state. You can start to see why this can be a very powerful tool, and why certain entities may want to do this type of analysis. I'll be making an API call to the api.open.fec.gov/v1/schedules/schedule_a/ endpoint since I care about data at the individual donor level.
 
 ### Built With
 
