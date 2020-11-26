@@ -19,7 +19,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project 
 
-This is a work in progress.
+This is a work in progress. Checkout the `dev` branch if you want to see more untested code.
 
 The main goal of this project is to showcase Golang, Python, and REST + GraphQL expertise. I'm also interested in benchmarking to find out how well the Go implementation does at crunching incredibly large queries using concurrent channels vs my initial Python implementations.
 
