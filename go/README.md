@@ -21,7 +21,7 @@
 
 This is a work in progress.
 
-The main goal of this project is to showcase Golang, Python, and REST + GraphQL expertise. I'm also interested to find out how well the Go implementation  does at crunching incredibly large queries using concurrent channels.
+The main goal of this project is to showcase Golang, Python, and REST + GraphQL expertise. I'm also interested in benchmarking to find out how well the Go implementation does at crunching incredibly large queries using concurrent channels vs my initial Python implementations.
 
 Specifically though, this project maps political affiliation of the Indian American demographic. We can do this by isolating for South Asian names, provided in a CSV corpus.
 This is just one application, you can isolate other demographics, and filter based on a multitude of factors including zip code, commitetes, dates, campaign finance data efilings, etc. and make inferences by analyzing the data returned. Feel free to browse their API here https://api.open.fec.gov/developers/ (I'm sure you can already start to think of other use cases, and why the RNC/DNC, political consulting firms, or non-state actors, would love to do this type of analysis...).
