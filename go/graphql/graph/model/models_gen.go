@@ -26,7 +26,7 @@ type IndividualContributor struct {
 	ID        string `json:"_id"`
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
-	State     bool   `json:"state"`
+	State     string `json:"state"`
 	ZipCode   *int   `json:"zipCode"`
 }
 
@@ -42,6 +42,6 @@ func (MinimumMetadata) IsCommittee() {}
 type NewIndividualContributor struct {
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
-	State     bool   `json:"state"`
+	State     string `json:"state"`
 	ZipCode   *int   `json:"zipCode"`
 }

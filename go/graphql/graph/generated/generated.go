@@ -262,7 +262,7 @@ type IndividualContributor {
   _id: String!
   firstName: String!
   lastName: String!
-  state: Boolean!
+  state: String!
   zipCode: Int
 }
 
@@ -278,7 +278,7 @@ type Query {
 input NewIndividualContributor {
   firstName: String!
   lastName: String!
-  state: Boolean!
+  state: String!
   zipCode: Int
 }
 
@@ -545,9 +545,9 @@ func (ec *executionContext) _IndividualContributor_state(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _IndividualContributor_zipCode(ctx context.Context, field graphql.CollectedField, obj *model.IndividualContributor) (ret graphql.Marshaler) {
@@ -1955,7 +1955,7 @@ func (ec *executionContext) unmarshalInputNewIndividualContributor(ctx context.C
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("state"))
-			it.State, err = ec.unmarshalNBoolean2bool(ctx, v)
+			it.State, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
